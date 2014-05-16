@@ -20,7 +20,8 @@ Here's our example blocking object:
 >>> class Car(object):
 ...     wheels = 4
 ...     def drive_to(self, location):
-...          pass # Assume the real implementation blocks.
+...          # Assume the real implementation blocks.
+...          return "driven to {0}".format(location)
 >>> car = Car()
 
 For demonstration purposes, we'll use a test doubles for the thread
@@ -41,19 +42,22 @@ Create a ``Thimble``:
 >>> from thimble import Thimble
 >>> car_thimble = Thimble(reactor, pool, car, ["drive_to"])
 
-When accessing a method named in the list, you get a wrapper:
+When accessing a method named in the list, you get an object wrapping
+it instead. Calling it returns a Deferred. Any arguments passed are
+passed verbatim to the wrapped method.
 
->>> car_thimble.drive_to
-<functools.partial object at 0x...>
-
-Calling it returns a Deferred. Any arguments passed are passed
-verbatim to the wrapped method.
-
->>> car_thimble.drive_to("work")
-<Deferred at 0x... current result: None>
+>>> d = car_thimble.drive_to("work")
+>>> d.result
+'driven to work'
 
 This Deferred has already fired synchronously, because we're using a
 fake thread pool and reactor.
+
+You can access other attributes of the wrapped object directly on the
+``Thimble``:
+
+>>> car.wheels
+4
 
 If the thread pool that you pass to a ``Thimble`` hasn't been started
 yet when it first tries to use it, the ``Thimble`` will start it and
