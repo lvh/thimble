@@ -2,6 +2,11 @@
  thimble
 =========
 
+.. image:: https://travis-ci.org/lvh/thimble.svg
+    :target: https://travis-ci.org/lvh/thimble
+.. image:: https://coveralls.io/repos/crypto101/merlyn/badge.png?branch=master
+   :target: https://coveralls.io/r/crypto101/merlyn?branch=master
+
 .. image:: https://dl.dropboxusercontent.com/u/38476311/Logos/thimble.jpg
 
 Assemble is a tool for playing with needle and thread safely. This
