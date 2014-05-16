@@ -44,11 +44,13 @@ Create a ``Thimble``:
 When accessing a method named in the list, you get a wrapper:
 
 >>> car_thimble.drive_to
+<functools.partial object at 0x...>
 
 Calling it returns a Deferred. Any arguments passed are passed
 verbatim to the wrapped method.
 
 >>> car_thimble.drive_to("work")
+<Deferred at 0x... current result: None>
 
 This Deferred has already fired synchronously, because we're using a
 fake thread pool and reactor.
