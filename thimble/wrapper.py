@@ -20,6 +20,11 @@ class Thimble(object):
         exception.
 
         """
+        if not self._pool.started:
+            self._pool.start()
+            self._reactor.addSystemEventTrigger(
+                "before", "shutdown", self._pool.stop)
+
         return deferToThreadPool(self._reactor, self._pool, f, *args, **kwargs)
 
 
