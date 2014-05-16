@@ -1,4 +1,6 @@
 """A Twisted thread-pool based wrapper for blocking APIs."""
-from .wrapper import Thimble
+from ._version import __version__
+version = __version__
 
-__all__ = ["Thimble"]
+from .wrapper import Thimble
+__all__ = ['Thimble']

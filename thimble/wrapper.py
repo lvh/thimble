@@ -1,19 +1,33 @@
+"""Implementation of a Twisted-friendly thread pool wrapper."""
 from functools import partial
 from twisted.internet.threads import deferToThreadPool
 
-class Thimble(object):
-    """A Twisted thread-pool wrapper for a blocking API.
 
-    """
+class Thimble(object):
+
+    """A Twisted thread-pool wrapper for a blocking API."""
+
     def __init__(self, reactor, pool, wrapped, blocking_methods):
+        """Initialize a :class:`Thimble`.
+
+        :param reactor: The reactor that will handle events.
+        :type reactor: :class:`twisted.internet.interfaces.IReactorThreads` and
+            :class:`twisted.internet.interfaces.IReactorCore`. Pretty much any
+            real reactor implementation will do.
+        :param pool: The thread pool to defer to.
+        :type pool: :class:`twisted.python.threadpool.ThreadPool`
+        :param wrapped: The blocking implementation being wrapped.
+        :param blocking_methods: The names of the methods that will be wrapped
+            and executed in the thread pool.
+        :type blocking_methods: ``list`` of native ``str``
+        """
         self._reactor = reactor
         self._pool = pool
         self._wrapped = wrapped
         self._blocking_methods = blocking_methods
 
-
     def _deferToThreadPool(self, f, *args, **kwargs):
-        """Defers execution of ``f(*args, **kwargs)`` to the thread pool.
+        """Defer execution of ``f(*args, **kwargs)`` to the thread pool.
 
         This returns a deferred which will callback with the result of
         that expression, or errback with a failure wrapping the raised
@@ -23,13 +37,12 @@ class Thimble(object):
         if not self._pool.started:
             self._pool.start()
             self._reactor.addSystemEventTrigger(
-                "before", "shutdown", self._pool.stop)
+                'before', 'shutdown', self._pool.stop)
 
         return deferToThreadPool(self._reactor, self._pool, f, *args, **kwargs)
 
-
     def __getattr__(self, attr):
-        """Gets an attribute from the wrapped object, wrapping it to make it
+        """Get an attribute from the wrapped object, wrapping it to make it
         asynchronous if necessary.
 
         """
