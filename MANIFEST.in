@@ -3,5 +3,3 @@ include AUTHORS
 include README.rst
 include requirements.txt
 include dev-requirements.txt
-include tox.ini
-include .coveragerc
