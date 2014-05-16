@@ -3,4 +3,4 @@ from ._version import __version__
 version = __version__
 
 from .wrapper import Thimble
-__all__ = ['Thimble']
+__all__ = 'Thimble',
