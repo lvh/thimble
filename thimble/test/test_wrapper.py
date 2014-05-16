@@ -94,14 +94,14 @@ class ThreadPoolStartAndCleanupTests(_TestSetupMixin, SynchronousTestCase):
         self.thimble.blocking_method(1, second=2)
 
         self.assertTrue(self.pool.started)
-        self.assertEqual(len(self.reactor.eventTriggers), 1)
-        phase, eventType, f, args, kwargs = self.reactor.eventTriggers[0]
 
+        self.assertEqual(len(self.reactor.eventTriggers), 1)
+        phase, eventType, _f, _args, _kwargs = self.reactor.eventTriggers[0]
         self.assertEqual(phase, "before")
         self.assertEqual(eventType, "shutdown")
-        self.assertEqual(f.im_func, self.threadPool.stop.im_func)
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {})
+
+        self.reactor.stop()
+        self.assertFalse(self.pool.started)
 
 
 class PublicAPITests(SynchronousTestCase):

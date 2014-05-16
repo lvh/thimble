@@ -41,15 +41,26 @@ class FakeReactor(object):
 
 
     def callFromThread(self, f, *a, **kw):
-        """
-        Just call the function in this thread.
+        """Just call the function synchronously in this thread.
+
         """
         f(*a, **kw)
 
 
-    def addSystemEventTrigger(self, phase, eventType, callable, *args, **kw):
+    def addSystemEventTrigger(self, phase, eventType, f, *args, **kw):
+        """Stores the event trigger.
+
         """
-        Stores the event trigger.
-        """
-        trigger = phase, eventType, callable, args, kw
+        trigger = phase, eventType, f, args, kw
         self.eventTriggers.append(trigger)
+
+
+    def stop(self):
+        """Runs the shutdown event triggers.
+
+        """
+        for phase, eventType, f, args, kwargs in self.eventTriggers:
+            if eventType != "shutdown":
+                continue
+
+            f(*args, **kwargs)
