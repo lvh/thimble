@@ -10,9 +10,9 @@ class ExampleSynchronousThing(object):
 
     """
     @property
-    def wrapped(self):
-        """This is here to verify that the ``wrapped`` attribute of the
-        :class:`Thimble` is used before the ``wrapped`` attribute of
+    def _wrapped(self):
+        """This is here to verify that the ``_wrapped`` attribute of the
+        :class:`Thimble` is used before the ``_wrapped`` attribute of
         the wrapped object.
 
         """
@@ -62,7 +62,8 @@ class AttributeAccessTests(_TestSetupMixin, SynchronousTestCase):
         ``wrapped``) returns the attribute of the :class:`Thimble`.
 
         """
-        self.assertIdentical(self.thimble.wrapped, self.wrapped)
+        self.assertIdentical(self.thimble._wrapped, self.wrapped)
+        self.assertIdentical(self.thimble._wrapped._wrapped, None)
 
 
 
