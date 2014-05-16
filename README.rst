@@ -4,7 +4,7 @@
 
 .. image:: https://travis-ci.org/lvh/thimble.svg
     :target: https://travis-ci.org/lvh/thimble
- .. image:: https://coveralls.io/repos/lvh/thimble/badge.png
+.. image:: https://coveralls.io/repos/lvh/thimble/badge.png
     :target: https://coveralls.io/r/lvh/thimble
 
 .. image:: https://dl.dropboxusercontent.com/u/38476311/Logos/thimble.jpg
