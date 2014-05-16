@@ -11,7 +11,7 @@ class FakeThreadPool(object):
     """
 
     def __init__(self):
-        """Intiialize the fake thread pool."""
+        """Initialize the fake thread pool."""
         self.started = False
         self.success = True
 
