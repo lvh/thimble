@@ -1,28 +1,32 @@
+"""Stubs and other utilities for thimble's test suite."""
+
 class FakeThreadPool(object):
 
     """Fake thread pool for testing purposes.
 
-    A fake thread pool that pretends to let you call things in a thread
-    with a callback. It calls the callback synchronously.
+    It pretends to let you call objects with some arguments in a
+    thread with a callback, but just does all of that synchronously in
+    the calling thread.
 
     """
 
     def __init__(self):
+        """Intiialize the fake thread pool."""
         self.started = False
         self.success = True
 
     def start(self):
-        """Sets the ``started`` attribute to ``True``."""
+        """Set the ``started`` attribute to ``True``."""
         self.started = True
 
     def stop(self):
-        """Sets the ``started`` attribute to True."""
+        """Set the ``started`` attribute to ``True``."""
         self.started = False
 
     def callInThreadWithCallback(self, onResult, f, *args, **kwargs):
-        """Remembers ``f, args, kwargs``, then synchronously evaluates
-        ``f(*args, **kwargs)`` in the current thread and calls the
-        callback with the result.
+        """Evaluate ``f(*args, **kwargs)`` and calls ``onResult``.
+
+        This happens synchronously and in the current thread.
 
         """
         onResult(self.success, f(*args, **kwargs))
@@ -38,6 +42,7 @@ class FakeReactor(object):
     """
 
     def __init__(self):
+        """Initialize the fake reactor."""
         self.eventTriggers = []
 
     def callFromThread(self, f, *a, **kw):
@@ -45,12 +50,12 @@ class FakeReactor(object):
         f(*a, **kw)
 
     def addSystemEventTrigger(self, phase, eventType, f, *args, **kw):
-        """Stores the event trigger."""
+        """Store the event trigger."""
         trigger = phase, eventType, f, args, kw
         self.eventTriggers.append(trigger)
 
     def stop(self):
-        """Runs the shutdown event triggers."""
+        """Run the shutdown event triggers."""
         for phase, eventType, f, args, kwargs in self.eventTriggers:
             if eventType != 'shutdown':
                 continue

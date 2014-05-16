@@ -42,8 +42,11 @@ class Thimble(object):
         return deferToThreadPool(self._reactor, self._pool, f, *args, **kwargs)
 
     def __getattr__(self, attr):
-        """Get an attribute from the wrapped object, wrapping it to make it
-        asynchronous if necessary.
+        """Get and maybe wraps an attribute from the wrapped object.
+
+        If the attribute is blocking, it will be wrapped so that
+        calling it will return a Deferred and the actual function will
+        be ran in a thread pool.
 
         """
         value = getattr(self._wrapped, attr)
