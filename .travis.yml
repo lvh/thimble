@@ -1,0 +1,14 @@
+language: python
+env:
+  - TOXENV=py27
+  - TOXENV=pypy
+matrix:
+  allow_failures:
+    - env: TOXENV=pypy
+install:
+  - pip install tox
+  - pip install coveralls
+script:
+  - tox
+after_success:
+  - coveralls
