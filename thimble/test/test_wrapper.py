@@ -91,6 +91,8 @@ class ThreadPoolStartAndCleanupTests(_TestSetupMixin, SynchronousTestCase):
         self.assertFalse(self.pool.started)
         self.assertEqual(self.reactor.eventTriggers, [])
 
+        self.thimble.blocking_method(1, second=2)
+
         self.assertTrue(self.pool.started)
         self.assertEqual(len(self.reactor.eventTriggers), 1)
         phase, eventType, f, args, kwargs = self.reactor.eventTriggers[0]
