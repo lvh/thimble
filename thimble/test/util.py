@@ -1,5 +1,6 @@
 """Stubs and other utilities for thimble's test suite."""
 
+
 class FakeThreadPool(object):
 
     """Fake thread pool for testing purposes.
