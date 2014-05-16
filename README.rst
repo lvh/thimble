@@ -30,6 +30,12 @@ pool and reactor; in real code, you'll want to use the real thing.
 >>> pool = FakeThreadPool()
 >>> reactor = FakeReactor()
 
+The pool hasn't been started yet. (We'll see why that matters in a
+minute.)
+
+>>> pool.started
+False
+
 Create a ``Thimble``:
 
 >>> from thimble import Thimble
@@ -47,12 +53,27 @@ verbatim to the wrapped method.
 This Deferred has already fired synchronously, because we're using a
 fake thread pool and reactor.
 
-While subclassing ``Thimble`` may accidentally work, it is not
-recommended. I reserve the right to change the implementation in a way
-that might break that: for example, by introducing a metaclass.
+If the thread pool that you pass to a ``Thimble`` hasn't been started
+yet when it first tries to use it, the ``Thimble`` will start it and
+schedule its shutdown. If you pass a thread pool that *was* already
+started, you are responsible for its shutdown. In this case, the
+thread pool was not started yet, so ``Thimble`` started it for you:
+
+>>> pool.started
+True
+
+Shut down the reactor, and the reactor will ask the thread pool to
+stop right before shutting down itself.
+
+>>> reactor.stop()
+>>> pool.started
+False
+
+Using thimble in your code
+--------------------------
 
 Thread pools
-------------
+~~~~~~~~~~~~
 
 You can choose to use the reactor thread pool, or create your own
 thread pool.
@@ -64,7 +85,13 @@ available threads in the pool (either by accident or because of a
 bug), that affects DNS resolution, which in turn can affect many other
 systems.
 
-If the thread pool that you pass to a ``Thimble`` hasn't been started
-yet when it first tries to use it, the ``Thimble`` will start it and
-schedule its shutdown. If you pass a thread pool that *was* already
-started, you are responsible for its shutdown.
+Entry points
+~~~~~~~~~~~~
+
+While subclassing ``Thimble`` may accidentally work, it is not
+recommended. I reserve the right to change the implementation in a way
+that might break that: for example, by introducing a metaclass.
+
+It's probably better to write a small utility function that either
+constructs a new thread pool from a shared thread pool, or always
+returns the same thimble.
