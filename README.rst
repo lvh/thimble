@@ -94,7 +94,40 @@ thread pool is shared between a lot of software by default, and is
 also used for DNS resolution. If your software blocks all the
 available threads in the pool (either by accident or because of a
 bug), that affects DNS resolution, which in turn can affect many other
-systems.
+systems; if it doesn't affect those systems directly (because they,
+too, want to use the reactor thread pool).
+
+It's probably most reliable to have a dedicated thread pool per
+application, for two reasons:
+
+- The application probably knows best what a good size would be for
+  the thread pool.
+- It is an appropriate state to put the global state: if you were to
+  put it in a library, different users of the library in the same
+  process can end up tripping over each other.
+
+Unfortunately, shared global state is pretty much how you do it::
+
+  from twisted.python.threadpool import ThreadPool
+  _the_thread_pool = _ThreadPool()
+
+See the documentation for the ThreadPool class for more details; it
+allows you to specify a minimum and maximum number of threads. The
+default values are probably pretty reasonable.
+
+Concurrency and thread safety
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The number of threads you specify your thread pool to have is the
+number of threads that can try to access your object concurrently.
+it's up to you to make sure that the object is actually thread safe.
+
+If you would like to provide a non-blocking API to an object that
+isn't thread safe, you can just limit the number of threads in the
+thread pool to 1, causing fully synchronized access. Keep in mind that
+attribute accesses for any attribute name that isn't in the
+``blocking_methods`` list will still be performed synchronously by the
+calling thread.
 
 Entry points
 ~~~~~~~~~~~~
@@ -104,7 +137,7 @@ recommended. I reserve the right to change the implementation in a way
 that might break that: for example, by introducing a metaclass.
 
 It's probably better to write a small utility function that either
-constructs a new thread pool from a shared thread pool, or always
+constructs a new ``Thimble`` that uses a shared thread pool, or always
 returns the same thimble.
 
 Changelog
@@ -120,6 +153,7 @@ v0.1.1 (WIP)
 - Added this changelog
 - Spelling fixes
 - Added a ``.gitignore``
+- Lots of documentation improvements
 
 v0.1.0
 ------
