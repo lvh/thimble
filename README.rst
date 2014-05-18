@@ -119,6 +119,7 @@ v0.1.1 (WIP)
 
 - Added this changelog
 - Spelling fixes
+- Added a ``.gitignore``
 
 v0.1.0
 ------
