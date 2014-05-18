@@ -1,0 +1,28 @@
+# Emacs
+*~
+\#*
+.\#*
+
+# Python
+*.pyc
+*.pyo
+.coverage
+.ropeproject
+_trial_temp
+.tox
+
+# Build junk
+.build/*
+MANIFEST
+dist/*
+*.egg-info/*
+*.egg
+
+# Twisted plugins
+dropin.cache
+
+# Sphinx
+_build
+
+# OS X
+.DS_Store
