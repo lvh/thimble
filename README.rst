@@ -106,3 +106,21 @@ that might break that: for example, by introducing a metaclass.
 It's probably better to write a small utility function that either
 constructs a new thread pool from a shared thread pool, or always
 returns the same thimble.
+
+Changelog
+=========
+
+Thimble uses SemVer_.
+
+.. _SemVer: http://semver.org/
+
+v0.1.1 (WIP)
+------------
+
+- Added this changelog
+- Spelling fixes
+
+v0.1.0
+------
+
+Initial public release.
