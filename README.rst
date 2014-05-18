@@ -147,8 +147,8 @@ Thimble uses SemVer_.
 
 .. _SemVer: http://semver.org/
 
-v0.1.1 (WIP)
-------------
+v0.1.1
+------
 
 - Added this changelog
 - Spelling fixes
