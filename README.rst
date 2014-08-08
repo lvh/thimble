@@ -160,13 +160,13 @@ has to be called in the reactor thread. For example:
 ...     def register_alarm_callback(self, callback):
 ...         self.alarm_callback = callback
 ...     def alarm(self):
-...         print "WEE WOO" * 5
+...         print " WOO ".join(["WEE"] * 5)
 ...         if self.alarm_callback is not None:
 ...             self.alarm_callback()
 >>> def alarm_callback():
-...     print "sending sms..."
 ...     # This uses Twisted to talk to the SMS service, so it
 ...     # needs to be called in the reactor thread.
+...     print "sending sms... hopefully I am in the reactor thread!"
 
 To do this, define an attribute hook function. That's a function that
 takes the thimble instance, the attribute name being looked up, and
@@ -180,8 +180,7 @@ its current value; then returns its replacement value.
 ...         callargs = getcallargs(val, *a, **kw)
 ...         orig_callback = callargs["callback"]
 ...         def wrapped_callback():
-...             print("calling original callback function in reactor "
-...                   "from other thread...")
+...             print "calling original callback in reactor thread"
 ...             thimble._reactor.callFromThread(orig_callback)
 ...         callargs["callback"] = wrapped_callback
 ...         return val(callback=wrapped_callback)
@@ -206,10 +205,10 @@ Set up the thimble:
 Now, when we access that method, we get the wrapper:
 
 >>> fancy_car_thimble.register_alarm_callback(alarm_callback)
->>> fancy_car_thimble.alarm_callback()
-calling original callback function in reactor from other thread...
-sending sms...
-
+>>> fancy_car_thimble.alarm()
+WEE WOO WEE WOO WEE WOO WEE WOO WEE
+calling original callback in reactor thread
+sending sms... hopefully I am in the reactor thread!
 
 You can also use hooks for methods that are asynchronified. The
 attribute hook is evaluated *before* the method is made asynchronous.
