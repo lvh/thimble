@@ -7,7 +7,8 @@ class Thimble(object):
 
     """A Twisted thread-pool wrapper for a blocking API."""
 
-    def __init__(self, reactor, pool, wrapped, blocking_methods):
+    def __init__(self, reactor, pool, wrapped, blocking_methods,
+                 attr_hooks=None):
         """Initialize a :class:`Thimble`.
 
         :param reactor: The reactor that will handle events.
@@ -20,11 +21,19 @@ class Thimble(object):
         :param blocking_methods: The names of the methods that will be wrapped
             and executed in the thread pool.
         :type blocking_methods: ``list`` of native ``str``
+        :param attr_hooks: A mapping of attribute names to attribute hook
+            functions. Attribute hook functions will be called with this
+            thimble object, the attribute name being accessed, and the
+            current attribute value; their return value will be used in
+            place of the real attribute value.
+        :type attr_hooks: :class:`dict` of native :class:`str` to ternary
+            callables
         """
         self._reactor = reactor
         self._pool = pool
         self._wrapped = wrapped
         self._blocking_methods = blocking_methods
+        self._attr_hooks = attr_hooks if attr_hooks is not None else {}
 
     def _deferToThreadPool(self, f, *args, **kwargs):
         """Defer execution of ``f(*args, **kwargs)`` to the thread pool.
@@ -50,6 +59,10 @@ class Thimble(object):
 
         """
         value = getattr(self._wrapped, attr)
+
+        hook = self._attr_hooks.get(attr)
+        if hook is not None:
+            value = hook(self, attr, value)
 
         if attr in self._blocking_methods:
             value = partial(self._deferToThreadPool, value)
