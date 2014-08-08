@@ -51,9 +51,13 @@ When accessing a method named in the list, you get an object wrapping
 it instead. Calling it returns a Deferred. Any arguments passed are
 passed verbatim to the wrapped method.
 
->>> d = car_thimble.drive_to("work")
->>> d.result
-'driven to work'
+>>> def print_(s):
+...     # can't use from __future__ import print_function because of a
+...     # doctest limitation :-(
+...     print s
+
+>>> d = car_thimble.drive_to("work").addCallback(print_)
+driven to work
 
 This Deferred has already fired synchronously, because we're using a
 fake thread pool and reactor.
