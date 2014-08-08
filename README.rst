@@ -147,6 +147,12 @@ Thimble uses SemVer_.
 
 .. _SemVer: http://semver.org/
 
+v0.2.0
+------
+
+- Minor updates to the tox CI set up
+- Upgraded dependencies
+
 v0.1.1
 ------
 
