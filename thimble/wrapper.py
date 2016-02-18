@@ -34,7 +34,7 @@ class Thimble(object):
         exception.
 
         """
-        if not self._pool.started:
+        if (not self._pool.started) and (not self._pool.joined):
             self._pool.start()
             self._reactor.addSystemEventTrigger(
                 'before', 'shutdown', self._pool.stop)
