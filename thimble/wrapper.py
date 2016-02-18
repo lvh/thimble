@@ -1,6 +1,8 @@
 """Implementation of a Twisted-friendly thread pool wrapper."""
 from functools import partial
 from twisted.internet.threads import deferToThreadPool
+from twisted.internet.defer import fail
+from twisted.internet.error import ReactorNotRunning
 
 
 class Thimble(object):
@@ -34,10 +36,14 @@ class Thimble(object):
         exception.
 
         """
+        if self._pool.joined:
+            return fail(
+                ReactorNotRunning("This thimble's threadpool already stopped.")
+            )
         if not self._pool.started:
             self._pool.start()
             self._reactor.addSystemEventTrigger(
-                'before', 'shutdown', self._pool.stop)
+                'during', 'shutdown', self._pool.stop)
 
         return deferToThreadPool(self._reactor, self._pool, f, *args, **kwargs)
 

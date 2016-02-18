@@ -1,6 +1,7 @@
 from twisted.trial.unittest import SynchronousTestCase
 from thimble import Thimble
 from thimble.test.util import FakeReactor, FakeThreadPool
+from twisted.internet.error import ReactorNotRunning
 
 
 class ExampleSynchronousThing(object):
@@ -99,11 +100,26 @@ class ThreadPoolStartAndCleanupTests(_TestSetupMixin, SynchronousTestCase):
 
         self.assertEqual(len(self.reactor.eventTriggers), 1)
         phase, eventType, _f, _args, _kwargs = self.reactor.eventTriggers[0]
-        self.assertEqual(phase, 'before')
+        self.assertEqual(phase, 'during')
         self.assertEqual(eventType, 'shutdown')
 
         self.reactor.stop()
         self.assertFalse(self.pool.started)
+
+    def test_stopping(self):
+        """
+        When deferring something to the thread pool, if that thread pool has
+        been stopped already, the ``Deferred`` will fail with a
+        ``ReactorNotRunning`` exception.
+        """
+        result1 = self.thimble.blocking_method(1, second=2)
+        self.successResultOf(result1)
+        self.reactor.stop()
+        self.assertFalse(self.pool.started)
+        self.assertTrue(self.pool.joined)
+
+        result2 = self.thimble.blocking_method(3, second=4)
+        self.failureResultOf(result2, ReactorNotRunning)
 
 
 class PublicAPITests(SynchronousTestCase):
