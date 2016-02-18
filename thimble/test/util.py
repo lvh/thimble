@@ -15,14 +15,16 @@ class FakeThreadPool(object):
         """Initialize the fake thread pool."""
         self.started = False
         self.success = True
+        self.joined = False
 
     def start(self):
         """Set the ``started`` attribute to ``True``."""
         self.started = True
 
     def stop(self):
-        """Set the ``started`` attribute to ``True``."""
+        """Set the ``started`` attribute to ``False``."""
         self.started = False
+        self.joined = True
 
     def callInThreadWithCallback(self, onResult, f, *args, **kwargs):
         """Evaluate ``f(*args, **kwargs)`` and calls ``onResult``.
