@@ -144,6 +144,75 @@ It's probably better to write a small utility function that either
 constructs a new ``Thimble`` that uses a shared thread pool, or always
 returns the same thimble.
 
+Attribute hooks
+~~~~~~~~~~~~~~~
+
+Sometimes, it isn't good enough to simply call a method in a thread
+somewhere. You may need to modify the arguments before calling the
+underlying method, too. For example, if the underlying method takes a
+callback function, it may be called in some other thread, but if the
+callback function expects to be able to interact with the reactor, it
+has to be called in the reactor thread. For example:
+
+>>> class FancyCar(Car):
+...     def __init__(self):
+...         self.alarm_callback = None
+...     def register_alarm_callback(self, callback):
+...         self.alarm_callback = callback
+...     def alarm(self):
+...         print " WOO ".join(["WEE"] * 5)
+...         if self.alarm_callback is not None:
+...             self.alarm_callback()
+>>> def alarm_callback():
+...     # This uses Twisted to talk to the SMS service, so it
+...     # needs to be called in the reactor thread.
+...     print "sending sms... hopefully I am in the reactor thread!"
+
+To do this, define an attribute hook function. That's a function that
+takes the thimble instance, the attribute name being looked up, and
+its current value; then returns its replacement value.
+
+>>> from functools import partial, wraps
+>>> from inspect import getcallargs
+>>> def hook(thimble, attr, val):
+...     @wraps(val)
+...     def run_callback_in_reactor_thread_wrapper(*a, **kw):
+...         callargs = getcallargs(val, *a, **kw)
+...         orig_callback = callargs["callback"]
+...         def wrapped_callback():
+...             print "calling original callback in reactor thread"
+...             thimble._reactor.callFromThread(orig_callback)
+...         callargs["callback"] = wrapped_callback
+...         return val(callback=wrapped_callback)
+...     return run_callback_in_reactor_thread_wrapper
+
+While all of this ``getcallargs`` trickery makes little sense when
+you know that there's only one such callback and it doesn't take any
+arguments, it's included here in the documentation because it's:
+
+- particularly useful when you have a wide array of methods with
+  slightly different signatures, but which all have a callback method
+  that needs to be wrapped like the above one (a reasonably common
+  case),
+- fairly unknown.
+
+Set up the thimble:
+
+>>> fancy_car = FancyCar()
+>>> fancy_car_thimble = Thimble(reactor, pool, fancy_car,
+...     ["drive_to"], {"register_alarm_callback": hook})
+
+Now, when we access that method, we get the wrapper:
+
+>>> fancy_car_thimble.register_alarm_callback(alarm_callback)
+>>> fancy_car_thimble.alarm()
+WEE WOO WEE WOO WEE WOO WEE WOO WEE
+calling original callback in reactor thread
+sending sms... hopefully I am in the reactor thread!
+
+You can also use hooks for methods that are asynchronified. The
+attribute hook is evaluated *before* the method is made asynchronous.
+
 Changelog
 =========
 
@@ -154,6 +223,9 @@ Thimble uses SemVer_.
 v0.2.0
 ------
 
+- Added attribute hooks.
+- Remove support for 2.6, because it doesn't have
+  ``inspect.getcallargs``
 - Minor updates to the tox CI set up
 - Upgraded dependencies
 
