@@ -1,2 +1,2 @@
-Twisted==19.2.1
+Twisted==23.8.0
 zope.interface==4.1.1
